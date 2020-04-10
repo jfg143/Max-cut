@@ -9,6 +9,7 @@ public class Class_BL {
     int id;
     double get;
     boolean Meter;
+    boolean[] Sol;
     Class_BL(int id,double get){
         this.id=id;
         this.get=get;
@@ -18,6 +19,12 @@ public class Class_BL {
         this.id=id;
         this.get=get;
         this.Meter=Meter;
+    }
+    
+    Class_BL(int id,double get,boolean[] Sol){
+        this.id=id;
+        this.get=get;
+        this.Sol=Sol;
     }
     
     public void Aniadir(boolean Meter){

@@ -54,17 +54,6 @@ public class Algoritmo implements Runnable{
                 Cutting(cont,rand.nextInt(vertices));
             }
         
-            suma=0;
-            for(i=0;i<vertices;i++){
-                if(Select[cont][i]){
-                    for(j=0;j<vertices;j++){
-                        if(!Select[cont][j]){
-                            suma=suma+C[i][j];
-                        }
-                    }
-                }
-            }
-            put_Cost(cont,suma);
         }    
         
     }

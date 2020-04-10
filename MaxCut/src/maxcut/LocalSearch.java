@@ -5,7 +5,8 @@ import java.util.Random;
 
 
 public class LocalSearch implements Runnable {
-    
+
+	Class_BL Final;
     int vertices;
     double alpha;
     double[][] C;
@@ -17,10 +18,12 @@ public class LocalSearch implements Runnable {
     boolean Select[][];
     double[] coste;
     Algoritmo[] alg;
+    int NSoluciones;
     Thread t2;
     LocalSearch(double[][]C,int vertices,int Procesadores,int NSoluciones,double alpha) throws InterruptedException{
         alg=new Algoritmo[Procesadores];
         this.alpha=alpha;
+        this.NSoluciones=NSoluciones;
         Select_Tot=new boolean [Procesadores][NSoluciones][vertices];
         coste_Tot=new double[Procesadores][NSoluciones];
         for(int i=0;i<Procesadores;i++){
@@ -36,12 +39,14 @@ public class LocalSearch implements Runnable {
         }
     }
     
-    LocalSearch(double alpha,double[]coste,boolean[][]Select,String Name,double[][] C){
+    LocalSearch(double alpha,double[]coste,boolean[][]Select,double[][] C,int NSoluciones,int vertices){
         this.alpha=alpha;
         this.coste=coste;
         this.Select=Select;
+        this.vertices=vertices;
+        this.NSoluciones=NSoluciones;
         this.C=C;
-        t2=new Thread(this,Name);
+        t2=new Thread(this);
     }
     
     
@@ -93,7 +98,7 @@ public class LocalSearch implements Runnable {
             }
             int seleccionar=rand.nextInt(contador);
             Class_BL sel=null;
-            System.out.println(seleccionar);
+            /*System.out.println(seleccionar);*/
             j=0;
             i=0;
             while(j<n){
@@ -111,7 +116,7 @@ public class LocalSearch implements Runnable {
         else{
             boolean[] Meter=new boolean[vertices-n];
             for(i=0;i<vertices-n;i++){Meter[i]=false;}
-            int contador=0,cont=0;
+            int contador=0;
             Value1=Max(Imp[1]);
             if(Value1<=0){return null;}//If the maximum value is't possitive we improve all the methods.
             Value2=Min(Imp[1]);
@@ -187,21 +192,21 @@ public class LocalSearch implements Runnable {
         return get;
     }
     
-    public void run2(double [][]C,boolean[] Select,int vertices){
+    public boolean[] run2(double [][]C,boolean[] Select,int vertices){
         Class_BL[][] aux1;
         aux1 = Value(C,Select,vertices);
-        int i,j,k,l;
-        for(i=0;i<2;i++){
+        /*int i,j,k,l;*/
+        /*for(i=0;i<2;i++){
              System.out.println("Estamos en: "+i);
             for(j=0;j<aux1[i].length;j++){
                 System.out.println(aux1[i][j].get);
             }
-        }
+        }*/
         Class_BL aux2;
         aux2=In_Out(aux1,vertices,alpha);
         while(aux2 != null){
-        System.out.println("El id es: "+aux2.id);
-        System.out.println("El id es: "+aux2.get);
+        /*System.out.println("El id es: "+aux2.id);
+        System.out.println("El id es: "+aux2.get);*/
             if(aux2.Meter){
                 Select[aux2.id]=true;
             }
@@ -211,20 +216,56 @@ public class LocalSearch implements Runnable {
         aux1 = Value(C,Select,vertices);
         aux2=In_Out(aux1,vertices,alpha);
         }
+        /*System.out.println();
         System.out.println();
         System.out.println();
-        System.out.println();
-        System.out.println("La soluciÃ³n es:");
+        System.out.println("La solución es:");
         for(i=0;i<Select.length;i++){
             System.out.print(Select[i]+" ");
-        }
-        
+        }*/
+        return Select;
+    }
+    
+    
+    public double Coste_Total(boolean[] Select) {
+        double suma=0;
+        int i,j;
+	        for(i=0;i<vertices;i++){
+	            if(Select[i]){
+	                for(j=0;j<vertices;j++){
+	                    if(!Select[j]){
+	                        suma=suma+C[i][j];
+	                    }
+	                }
+	            }
+	        }
+        return suma;
+    }
+    
+    public int Maximo(double[] Cost) {
+    	double max=Cost[0];
+    	int index=0;
+    	int i;
+    	for(i=1;i<Cost.length;i++) {
+    		if(Cost[i]>max){max=Cost[i];index=i;}
+    	}
+    	return index;
     }
     
     @Override
     public void run() {
-       /*Integer.parseInt();*/
+       int i;
+       boolean[][] Seleccionado=new boolean[NSoluciones][];
+       double[] Cost=new double[NSoluciones];
+       for(i=0;i<NSoluciones;i++) {
+    	   Seleccionado[i]=run2(C,Select[i],vertices);
+    	   Cost[i]=Coste_Total(Seleccionado[i]);
+    	   
+       }
+       int index=Maximo(Cost);
+       System.out.println("El coste de la solución es: "+Cost[index]+" "+index);
+       this.Final=new Class_BL(index,Cost[index],Seleccionado[index]);
     }
-    
+   
     
 }
